@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, cpSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -27,12 +27,33 @@ function serveRootAssets() {
 
         createReadStream(filePath).pipe(res);
       });
+    },
+    closeBundle() {
+      // Copy assets to dist after build if they exist
+      if (existsSync(rootAssetsDir)) {
+        const distDir = path.resolve(__dirname, 'dist');
+        const distAssetsDir = path.resolve(distDir, 'assets');
+
+        console.log(`Copying assets from ${rootAssetsDir} to ${distAssetsDir}`);
+
+        try {
+          mkdirSync(distAssetsDir, { recursive: true });
+          cpSync(rootAssetsDir, distAssetsDir, { recursive: true });
+          console.log('Assets copied successfully');
+        } catch (error) {
+          console.error('Error copying assets:', error);
+        }
+      } else {
+        console.warn(`Warning: Assets directory not found at ${rootAssetsDir}`);
+        console.warn('Please download assets from https://huggingface.co/Supertone/supertonic-3');
+      }
     }
   };
 }
 
 export default defineConfig({
   plugins: [serveRootAssets()],
+  publicDir: 'public',
   server: {
     port: 3000,
     open: true
