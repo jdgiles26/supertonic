@@ -1,6 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "cd web && git lfs install && git clone https://huggingface.co/Supertone/supertonic-3 ../assets && npm install && npm run build",
+  "outputDirectory": "web/dist",
+  "installCommand": "echo 'Skipping default install'",
+  "framework": null,
   "headers": [
     {
       "source": "/(.*)",
@@ -16,7 +18,7 @@
       ]
     },
     {
-      "source": "/(.*\\.onnx)",
+      "source": "/assets/(.*\\.onnx)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -29,7 +31,7 @@
       ]
     },
     {
-      "source": "/(.*\\.wasm)",
+      "source": "/assets/(.*\\.wasm)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -38,6 +40,15 @@
         {
           "key": "Content-Type",
           "value": "application/wasm"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*\\.json)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
         }
       ]
     }
